@@ -773,6 +773,24 @@ void AEgoVehicle::ConstructDashText() // dashboard text (speedometer, turn signa
         GearShifter->SetHorizontalAlignment(EHorizTextAligment::EHTA_Center);
         check(GearShifter != nullptr);
     }
+
+    // create additional text (AM)
+    //if (VehicleParams.Get<bool>("Dashboard", "AtextEnabled"))
+    //{
+        Atext = CreateEgoObject<UTextRenderComponent>("Atext");
+        Atext->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+        Atext->SetRelativeLocation(DashboardLocnInVehicle + FVector(0, 5.f, -10.f));
+        Atext->SetRelativeRotation(FRotator(0.f, 180.f, 0.f));
+        //GearShifter->SetRelativeTransform(VehicleParams.Get<FTransform>("Dashboard", "AtextTransform"));
+        Atext->SetTextRenderColor(FColor::Blue);
+        Atext->SetText(FText::FromString("Hello"));
+        Atext->SetXScale(1.f);
+        Atext->SetYScale(1.f);
+        Atext->SetWorldSize(5); // scale the font with this
+        Atext->SetVerticalAlignment(EVerticalTextAligment::EVRTA_TextCenter);
+        Atext->SetHorizontalAlignment(EHorizTextAligment::EHTA_Center);
+        check(Atext != nullptr);
+    //}
 }
 
 void AEgoVehicle::UpdateDash()
