@@ -14,6 +14,10 @@
 
 #include <algorithm>
 
+//#include "Components/WidgetComponent.h"
+//#include "Blueprint/UserWidget.h"
+
+
 // Sets default values
 AEgoVehicle::AEgoVehicle(const FObjectInitializer &ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -105,6 +109,7 @@ void AEgoVehicle::BeginPlay()
 
     // initialize
     InitAIPlayer();
+
 
     // Bug-workaround for initial delay on throttle; see https://github.com/carla-simulator/carla/issues/1640
     this->GetVehicleMovementComponent()->SetTargetGear(1, true);
@@ -779,7 +784,7 @@ void AEgoVehicle::ConstructDashText() // dashboard text (speedometer, turn signa
     //{
         Atext = CreateEgoObject<UTextRenderComponent>("Atext");
         Atext->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-        Atext->SetRelativeLocation(DashboardLocnInVehicle + FVector(0, 5.f, -10.f));
+        Atext->SetRelativeLocation(DashboardLocnInVehicle + FVector(0, 50.f, 70.f));
         Atext->SetRelativeRotation(FRotator(0.f, 180.f, 0.f));
         //GearShifter->SetRelativeTransform(VehicleParams.Get<FTransform>("Dashboard", "AtextTransform"));
         Atext->SetTextRenderColor(FColor::Blue);
@@ -791,6 +796,30 @@ void AEgoVehicle::ConstructDashText() // dashboard text (speedometer, turn signa
         Atext->SetHorizontalAlignment(EHorizTextAligment::EHTA_Center);
         check(Atext != nullptr);
     //}
+
+
+        CubeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CubeMesh"));
+        CubeMesh->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+
+        FString CubeMeshPath = TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'");
+        FString CubeMaterialPath = TEXT("Material'/Game/DReyeVR/Custom/TranslucentParamMaterial.TranslucentParamMaterial'");
+
+        UStaticMesh* StaticMesh = LoadObject<UStaticMesh>(nullptr, *CubeMeshPath);
+        if (StaticMesh)
+        {
+            CubeMesh->SetStaticMesh(StaticMesh);
+        }
+
+        UMaterialInterface* Material = LoadObject<UMaterialInterface>(nullptr, *CubeMaterialPath);
+        if (Material)
+        {
+            CubeMesh->SetMaterial(0, Material);
+        }
+
+        CubeMesh->SetRelativeLocation(DashboardLocnInVehicle + FVector(40.f, 50.f, 70.f));
+        Atext->SetRelativeRotation(FRotator(0.f, 180.f, 0.f));
+        CubeMesh->SetWorldScale3D(FVector(0.01f, 0.6f, 0.35f)); // Set the scale of the cube as desired
+
 }
 
 void AEgoVehicle::UpdateDash()
