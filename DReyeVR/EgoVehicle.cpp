@@ -170,6 +170,13 @@ void AEgoVehicle::Tick(float DeltaSeconds)
     // Render EgoVehicle dashboard
     UpdateDash();
 
+    //(AM)const FVector& CameraLoc = GetCamera()->GetComponentLocation();
+    //(AM)const FRotator& CameraRot = GetCamera()->GetComponentRotation();
+    //(AM)const FVector InFrontVec = CameraRot.RotateVector(FVector::ForwardVector);
+    //(AM)const float Scale = 1.f; // how far away the actor should be
+    //(AM)CubeMesh->SetWorldLocation(CameraLoc + InFrontVec * Scale);
+    //(AM)CubeMesh->SetWorldRotation(CameraRot);
+
     // Update the steering wheel to be responsive to user input
     TickSteeringWheel(DeltaSeconds);
 
@@ -782,43 +789,58 @@ void AEgoVehicle::ConstructDashText() // dashboard text (speedometer, turn signa
     // create additional text (AM)
     //if (VehicleParams.Get<bool>("Dashboard", "AtextEnabled"))
     //{
-        Atext = CreateEgoObject<UTextRenderComponent>("Atext");
-        Atext->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-        Atext->SetRelativeLocation(DashboardLocnInVehicle + FVector(0, 50.f, 70.f));
-        Atext->SetRelativeRotation(FRotator(0.f, 180.f, 0.f));
-        //GearShifter->SetRelativeTransform(VehicleParams.Get<FTransform>("Dashboard", "AtextTransform"));
-        Atext->SetTextRenderColor(FColor::Blue);
-        Atext->SetText(FText::FromString("Hello"));
-        Atext->SetXScale(1.f);
-        Atext->SetYScale(1.f);
-        Atext->SetWorldSize(5); // scale the font with this
-        Atext->SetVerticalAlignment(EVerticalTextAligment::EVRTA_TextCenter);
-        Atext->SetHorizontalAlignment(EHorizTextAligment::EHTA_Center);
-        check(Atext != nullptr);
+        //(AM) Atext = CreateEgoObject<UTextRenderComponent>("Atext");
+        //(AM) Atext->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+        //(AM) Atext->SetRelativeLocation(DashboardLocnInVehicle + FVector(0, 30.f, 30.f));
+        //(AM) Atext->SetRelativeRotation(FRotator(0.f, 180.f, 0.f));
+        //(AM) //GearShifter->SetRelativeTransform(VehicleParams.Get<FTransform>("Dashboard", "AtextTransform"));
+        //(AM) Atext->SetTextRenderColor(FColor::Blue);
+        //(AM) Atext->SetText(FText::FromString("Hello"));
+        //(AM) Atext->SetXScale(1.f);
+        //(AM) Atext->SetYScale(1.f);
+        //(AM) Atext->SetWorldSize(5); // scale the font with this
+        //(AM) Atext->SetVerticalAlignment(EVerticalTextAligment::EVRTA_TextCenter);
+        //(AM) Atext->SetHorizontalAlignment(EHorizTextAligment::EHTA_Center);
+        //(AM) check(Atext != nullptr);
     //}
 
+        //(AM) text overlay
+        //CubeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CubeMesh"));
+        //CubeMesh->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+        //CubeMesh->AttachToComponent(FirstPersonCam, FAttachmentTransformRules::KeepRelativeTransform);
 
-        CubeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CubeMesh"));
-        CubeMesh->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+        //FString CubeMeshPath = TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'");
+        //FString CubeMaterialPath = TEXT("Material'/Game/DReyeVR/Custom/OpaqueParamMaterial.OpaqueParamMaterial'");
+        //FString CubeMaterialPath = TEXT("Material'/Game/DReyeVR/Custom/TranslucentParamMaterial.TranslucentParamMaterial'");
 
-        FString CubeMeshPath = TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'");
-        FString CubeMaterialPath = TEXT("Material'/Game/DReyeVR/Custom/TranslucentParamMaterial.TranslucentParamMaterial'");
+        //UStaticMesh* StaticMesh = LoadObject<UStaticMesh>(nullptr, *CubeMeshPath);
+        //if (StaticMesh)
+        //{
+        //    CubeMesh->SetStaticMesh(StaticMesh);
+        //}
+        //
+        //UMaterialInterface* Material = LoadObject<UMaterialInterface>(nullptr, *CubeMaterialPath);
+        //if (Material)
+        //{
+        //    CubeMesh->SetMaterial(0, Material);
+        //}
+        //
+        //CubeMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision); // (AM) So that this object doesn't collide with others
+        //
+        //CubeMesh->SetRelativeLocation(DashboardLocnInVehicle + FVector(40.f, 50.f, 70.f));
+        //CubeMesh->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
+        //CubeMesh->SetRelativeLocation(FVector(10.f,0.f,0.f));
+        //CubeMesh->SetRelativeRotation(FRotator(0.f, 180.f, 0.f));
+        //CubeMesh->SetWorldScale3D(FVector(100.f, 100.f, 100.f)); // Set the scale of the cube as desired (0.01;0.6;0.35)
 
-        UStaticMesh* StaticMesh = LoadObject<UStaticMesh>(nullptr, *CubeMeshPath);
-        if (StaticMesh)
-        {
-            CubeMesh->SetStaticMesh(StaticMesh);
-        }
-
-        UMaterialInterface* Material = LoadObject<UMaterialInterface>(nullptr, *CubeMaterialPath);
-        if (Material)
-        {
-            CubeMesh->SetMaterial(0, Material);
-        }
-
-        CubeMesh->SetRelativeLocation(DashboardLocnInVehicle + FVector(40.f, 50.f, 70.f));
-        Atext->SetRelativeRotation(FRotator(0.f, 180.f, 0.f));
-        CubeMesh->SetWorldScale3D(FVector(0.01f, 0.6f, 0.35f)); // Set the scale of the cube as desired
+        //const FVector& CameraLoc = GetCamera()->GetComponentLocation();
+        //const FRotator& CameraRot = GetCamera()->GetComponentRotation();
+        //const FVector InFrontVec = CameraRot.RotateVector(FVector::ForwardVector);
+        //const float Scale = 1.f; // how far away the actor should be
+        //CubeMesh->SetWorldLocation(CameraLoc + InFrontVec * Scale);
+        //CubeMesh->SetWorldRotation(CameraRot);
+        //CubeMesh->SetRelativeLocation(CameraLoc + InFrontVec * Scale);
+        //CubeMesh->SetRelativeRotation(CameraRot);
 
 }
 

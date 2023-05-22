@@ -239,7 +239,8 @@ class CARLAUE4_API AEgoVehicle : public ACarlaWheeledVehicle
     
     UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true")) // dashboard text(AM)
     class UTextRenderComponent* Atext; // dashboard text(AM)
-    UPROPERTY(EditAnywhere, Category = "Mesh")
+    //UPROPERTY(EditAnywhere, Category = "Mesh")
+    UPROPERTY(Category = "Mesh", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
     class UStaticMeshComponent* CubeMesh = nullptr;
 
     void UpdateDash();
