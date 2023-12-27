@@ -400,6 +400,7 @@ void AEgoVehicle::TickAutopilot()
     if (AI_Player != nullptr)
     {
         bAutopilotEnabled = AI_Player->IsAutopilotEnabled();
+        TickAutopilotIndicator(bAutopilotEnabled);
     }
 }
 
@@ -922,9 +923,31 @@ void AEgoVehicle::ConstructSteeringWheel()
     SteeringWheel->SetVisibility(bEnableSteeringWheel);
 }
 
+void AEgoVehicle::InitAutopilotIndicator()
+{
+    bool bEnableAutopilotIndicator = GeneralParams.Get<bool>("WheelFace", "EnableAutopilotIndicator");
+    if (SteeringWheel == nullptr || World == nullptr || bEnableAutopilotIndicator == false)
+        return;
+    AutopilotIndicator = ADReyeVRCustomActor::CreateNew(SM_SPHERE, MAT_OPAQUE, World, "AI_Indicator");
+    const FVector AutopilotIndicatorLocation = GeneralParams.Get<FVector>("WheelFace", "AutopilotIndicatorLoc");
+    const float AutopilotIndicatorSize = GeneralParams.Get<float>("WheelFace", "AutopilotIndicatorSize");
+    AutopilotIndicator->SetActorLocation(AutopilotIndicatorLocation);
+    check(AutopilotIndicator != nullptr);
+    AutopilotIndicator->Activate();
+    AutopilotIndicator->SetActorScale3D(AutopilotIndicatorSize * FVector::OneVector);
+    AutopilotIndicator->AttachToComponent(SteeringWheel, FAttachmentTransformRules::KeepRelativeTransform);
+    AutopilotIndicator->MaterialParams.BaseColor = ButtonNeutralCol; // close to off
+    AutopilotIndicator->MaterialParams.Emissive = ButtonNeutralCol;  // close to off
+    AutopilotIndicator->UpdateMaterial();
+    AutopilotIndicator->SetActorTickEnabled(false);      // don't tick these actors (for performance)
+    AutopilotIndicator->SetActorRecordEnabled(false);    // don't need to record these actors either
+    AutopilotIndicator->GetMesh()->SetCastShadow(false); // don't want shadows (looks weird)
+    bInitializedAutopilotIndicator = true;
+}
+
 void AEgoVehicle::InitWheelButtons()
 {
-    bool bEnableWheelFaceButtons = GeneralParams.Get<bool>("WheelButtons", "EnableWheelButtons");
+    bool bEnableWheelFaceButtons = GeneralParams.Get<bool>("WheelFace", "EnableWheelButtons");
     if (SteeringWheel == nullptr || World == nullptr || bEnableWheelFaceButtons == false)
         return;
     // left buttons (dpad)
@@ -943,11 +966,11 @@ void AEgoVehicle::InitWheelButtons()
     const FRotator PointUp(0.f, 0.f, 0.f);
     const FRotator PointDown(0.f, 0.f, 180.f);
 
-    const FVector LeftCenter = GeneralParams.Get<FVector>("WheelButtons", "ABXYLocation");
-    const FVector RightCenter = GeneralParams.Get<FVector>("WheelButtons", "DpadLocation");
+    const FVector LeftCenter = GeneralParams.Get<FVector>("WheelFace", "ABXYLocation");
+    const FVector RightCenter = GeneralParams.Get<FVector>("WheelFace", "DpadLocation");
 
     // increase to separate the buttons more
-    const float ButtonDist = GeneralParams.Get<float>("WheelButtons", "QuadButtonSpread");
+    const float ButtonDist = GeneralParams.Get<float>("WheelFace", "QuadButtonSpread");
 
     Button_DPad_Up->SetActorLocation(LeftCenter + ButtonDist * FVector::UpVector);
     Button_DPad_Up->SetActorRotation(PointUp);
@@ -976,8 +999,9 @@ void AEgoVehicle::InitWheelButtons()
         Button->MaterialParams.BaseColor = ButtonNeutralCol;
         Button->MaterialParams.Emissive = ButtonNeutralCol;
         Button->UpdateMaterial();
-        Button->SetActorTickEnabled(false);   // don't tick these actors (for performance)
-        Button->SetActorRecordEnabled(false); // don't need to record these actors either
+        Button->SetActorTickEnabled(false);      // don't tick these actors (for performance)
+        Button->SetActorRecordEnabled(false);    // don't need to record these actors either
+        Button->GetMesh()->SetCastShadow(false); // don't want shadows (looks weird)
     }
     bInitializedButtons = true;
 }
@@ -989,6 +1013,17 @@ void AEgoVehicle::UpdateWheelButton(ADReyeVRCustomActor *Button, bool bEnabled)
     Button->MaterialParams.BaseColor = bEnabled ? ButtonPressedCol : ButtonNeutralCol;
     Button->MaterialParams.Emissive = bEnabled ? ButtonPressedCol : ButtonNeutralCol;
     Button->UpdateMaterial();
+}
+
+void AEgoVehicle::TickAutopilotIndicator(bool bAutopilotEnabled)
+{
+    if (AutopilotIndicator == nullptr)
+        return;
+    const FLinearColor On = FLinearColor(0.537, 0.812, 0.941);         // baby blue
+    const FLinearColor Off = 0.1f * FLinearColor(0.537, 0.812, 0.941); // baby blue (off)
+    AutopilotIndicator->MaterialParams.BaseColor = bAutopilotEnabled ? On : Off;
+    AutopilotIndicator->MaterialParams.Emissive = 500.f * (bAutopilotEnabled ? On : Off);
+    AutopilotIndicator->UpdateMaterial();
 }
 
 void AEgoVehicle::DestroySteeringWheel()
@@ -1011,6 +1046,8 @@ void AEgoVehicle::TickSteeringWheel(const float DeltaTime)
         return;
     if (!bInitializedButtons)
         InitWheelButtons();
+    if (!bInitializedAutopilotIndicator)
+        InitAutopilotIndicator();
     const FRotator CurrentRotation = SteeringWheel->GetRelativeRotation();
     FRotator NewRotation = CurrentRotation;
     if (Pawn && Pawn->GetIsLogiConnected() && !GetAutopilotStatus())
