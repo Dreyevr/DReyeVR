@@ -29,6 +29,7 @@
   - **IMPORTANT:** if the `git clone` link does not work for you, you probably need to [join the Epic Games Organization](https://www.unrealengine.com/en-US/ue4-on-github) to get access to UnrealEngine and all of its forks. 
   - UE4 build instructions for your system can be found here: [Windows](https://carla.readthedocs.io/en/0.9.13/build_windows/#unreal-engine), [Linux](https://carla.readthedocs.io/en/0.9.13/build_linux/#unreal-engine), [Mac*](https://github.com/GustavoSilvera/carla/blob/m1/Docs/build_mac.md#unreal-engine-fork )
   <!-- - NOTE: We only keep our own HARPLab fork of Carla's fork to preserve version compatibility and enable minor features that Carla doesn't need (ex. foveated rendering). -->
+  - In order to successfully run Setup.sh, you will need to download and replace the Commit.gitdeps.xml file within /Engine/Build. See updated XML file at [Commit.gitdeps.xml](https://github.com/HARPLab/UnrealEngine/blob/DReyeVR-0.9.13/Engine/Build/Commit.gitdeps.xml)
 
 - You'll then need to clone and build a [vanilla Carla 0.9.13](https://carla.readthedocs.io/en/0.9.13/#building-carla)
   ```bash
@@ -261,7 +262,7 @@ make check CARLA=../carla
   conda activate carla13 # will need to run this ONCE before opening a new terminal!
   conda install numpy
   ```
-  - **READ THIS FIRST (Linux)**: You might run into a problem when compiling Boost 1.72.0 (required by `LibCarla`).
+- **READ THIS FIRST (Linux)**: You might run into a problem when compiling Boost 1.72.0 (required by `LibCarla`).
     <details>
 
     <summary> Show instructions to get Anaconda working on Linux </summary>
@@ -272,14 +273,16 @@ make check CARLA=../carla
       ... PATH/TO/ANACONDA/envs/carla/bin/python3 # example output
 
       # go to carla/install dir from here
-      cd PATH/TO/ANACONDA/envs/carla/install
-      
+      cd PATH/TO/ANACONDA/envs/carla/include
+
       # create a symlink between python3.7 -> python3.7m
       ln -s python3.7m python3.7
       ```
+      Install `boost_1_72_0.tar.gz` manually from https://github.com/jerry73204/carla/releases/tag/fix-boost and place file in `Build/boost_1_72_0.tar.gz`
+      Open `Util/BuildTools/Setup.sh` (or `Util/BuildTools/Setup.bat` on Windows)
+      Find the section named `Get boost` includes and comment out the `wget` lines.
       Now when you `make LibCarla` again, the `boost` errors should be resolved.
       - For more information see the bottom of this [SO post](https://stackoverflow.com/questions/42839382/failing-to-install-boost-in-python-pyconfig-h-not-found)
-
     </details>
 
   - **READ THIS FIRST (Windows)**: Windows anaconda is a bit more of a pain to deal with.
